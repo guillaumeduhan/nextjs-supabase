@@ -1,7 +1,6 @@
 'use client';
 
 import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Login() {
@@ -11,21 +10,23 @@ export default function Login() {
   }>({
     email: '',
     password: ''
-  })
+  });
 
-  const router = useRouter();
+  const [success, setSuccess] = useState<boolean>(false);
 
   const login = async () => {
     try {
       let { data: dataUser, error } = await supabase
         .auth
-        .signInWithPassword({
+        .signInWithOtp({
           email: data.email,
-          password: data.password
+          options: {
+            shouldCreateUser: true
+          }
         })
 
       if (dataUser) {
-        router.refresh();
+        setSuccess(true);
       }
 
     } catch (error) {
@@ -51,7 +52,7 @@ export default function Login() {
         onChange={handleChange}
       />
     </div>
-    <div className='grid'>
+    {/* <div className='grid'>
       <label>Password</label>
       <input
         type='password'
@@ -59,7 +60,8 @@ export default function Login() {
         value={data?.password}
         onChange={handleChange}
       />
-    </div>
+    </div> */}
+    {success && <div className="my-4 bg-green-100 px-2 text-green-600">An email has been sent to {data.email} to login.</div>}
     <div>
       <button className="px-4 py-2 bg-blue-500 rounded cursor-pointer" onClick={login}>Login</button>
     </div>
