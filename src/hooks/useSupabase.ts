@@ -1,8 +1,16 @@
 // functional logic hook
 
 import { supabase } from "@/lib/supabase";
+import { useState } from "react";
 
 export const useSupabase = () => {
+  const [user, setUser] = useState<any>()
+
+  const getCurrentUser = async () => {
+    const { data: { user: currentUser } } = await supabase.auth.getUser()
+    setUser(currentUser)
+  }
+
   const getSession = async () => {
     const {
       data: {
@@ -11,8 +19,6 @@ export const useSupabase = () => {
     } = await supabase.auth.getSession();
 
     const { access_token, refresh_token }: any = session;
-
-    console.log(session)
 
     await setSession(access_token, refresh_token);
 
@@ -39,6 +45,8 @@ export const useSupabase = () => {
   }
 
   return {
+    user,
+    getCurrentUser,
     setSession,
     refreshSession,
     getSession
