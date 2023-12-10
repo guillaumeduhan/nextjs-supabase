@@ -1,45 +1,20 @@
 "use client";
 
-import { supabase } from "@/lib/supabase";
+import { useArticles } from "@/hooks/useArticles";
 import { useEffect } from "react";
 
 export default function Home() {
-  const getSession = async () => {
-    const {
-      data: {
-        session
-      }
-    } = await supabase.auth.getSession();
-
-    const { access_token, refresh_token }: any = session;
-
-    await setSession(access_token, refresh_token);
-
-    return session
-  }
-
-  const refreshSession = async () => {
-    const {
-      data: {
-        session
-      }
-    } = await supabase.auth.refreshSession();
-
-    return session
-  }
-
-  const setSession = async (access_token: string, refresh_token: string) => {
-    const { data, error } = await supabase.auth.setSession({
-      access_token,
-      refresh_token
-    });
-
-    return true
-  }
+  const { articles, getArticles } = useArticles()
 
   useEffect(() => {
-    getSession()
+    getArticles()
   }, []);
 
-  return <div>Logged in</div>
+  return <div>
+    <ul>
+      {articles.map((article: any, key: number) => {
+        return <li key={key}>{article.title}</li>
+      })}
+    </ul>
+  </div>
 }
