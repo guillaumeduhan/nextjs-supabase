@@ -1,18 +1,34 @@
-import { supabase } from "@/lib/supabase";
+import { permit } from "@/lib/permit";
 
-export default function Home() {
-  const setNewView = async () => {
-    const { data, error } = await supabase
-      .from("views")
-      .insert({
-        name: 'random name'
-      })
+export const dynamic = 'force-dynamic';
 
-    if (data) console.log(data)
-    if (error) console.log(error)
-  };
+const getUsers = async () => {
+  const result = await permit.api.listUsers()
+  return result
+}
 
-  setNewView();
+export default async function Home() {
+  const users = await getUsers();
 
-  return <div>hello</div>
+  return <div className="container grid gap-6 my-12 mx-auto max-w-[1000px]">
+    <header className="grid gap-2">
+      <h1>List of users</h1>
+      <p>Here is a list of users coming from Permit.</p>
+    </header>
+    <div>
+      <ul>
+        {users?.map((user: any, key: number) => <li className="flex gap-2" key={key}>
+          <span>{user.email}</span>
+          <div>
+            {user.roles?.map((obj: any, roleKey: number) =>
+              <span className="bg-purple-100 text-purple-600 px-2 py-1 rounded-full" key={roleKey}>{obj.role}</span>
+            )}
+          </div>
+        </li>)}
+      </ul>
+    </div>
+    <footer>
+      <button>+ Add a new user</button>
+    </footer>
+  </div>
 }
